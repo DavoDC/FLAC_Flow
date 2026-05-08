@@ -9,10 +9,12 @@ Python CLI tool that batch-converts FLAC files to MP3 (VBR V0 using LAME) and op
 - Python 3.x
 - No external Python packages required for MVP (stdlib only: `json`, `subprocess`, `pathlib`, `shutil`, `time`)
 
-## External Tools (must be on PATH)
+## External Tools (auto-downloaded, NOT required on PATH)
 
-- `ffmpeg` - handles LAME V0 encoding: `ffmpeg -i input.flac -codec:a libmp3lame -qscale:a 0 output.mp3`
-- `metaflac` - scrubs PICTURE and PADDING blocks from FLAC files before conversion
+- `ffmpeg` - handles LAME V0 encoding. Auto-downloaded to `dependencies/ffmpeg/ffmpeg.exe` on first run.
+- `metaflac` - scrubs PICTURE and PADDING blocks. Auto-downloaded to `dependencies/flac/metaflac.exe` on first run.
+
+Both are downloaded by `src/deps.py` at startup if not already present. Always call via full path, never via PATH lookup. Pattern: `RivalsVidMaker/src/ffmpeg_setup.py`.
 
 ## Architecture
 
