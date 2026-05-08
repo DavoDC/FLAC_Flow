@@ -1,2 +1,4 @@
 @echo off
-wt.exe -p "Git Bash" -d "%~dp0.." "C:\Program Files\Git\bin\bash.exe" --login -i "%~dp0run.sh"
+cd /d "%~dp0.."
+python src/flac_flow.py
+pause
