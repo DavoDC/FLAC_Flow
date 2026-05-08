@@ -39,13 +39,28 @@ On failure: print a clear message (missing key, wrong type, folder not found), t
 
 ---
 
-**Startup dependency check**
+**Auto-download dependencies**
 
-Before touching any files, verify `ffmpeg` and `metaflac` are on PATH.
+On startup, check if `ffmpeg.exe` and `metaflac.exe` exist in `dependencies/`. If missing, download and extract them automatically - no manual install required.
 
-Check method (Windows): `where ffmpeg` and `where metaflac` via subprocess. Exit code 0 = found.
+Pattern to follow: `RivalsVidMaker/src/ffmpeg_setup.py` (already working, pattern-copy it).
 
-On failure: print each missing tool by name and a one-line hint pointing to `dependencies/README.md`. Exit cleanly.
+Module: `src/deps.py`
+
+**FFmpeg:**
+- Check: `dependencies/ffmpeg/ffmpeg.exe` exists
+- Download from: `https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip`
+- Extract: `ffmpeg.exe`, `ffprobe.exe`, `ffplay.exe` into `dependencies/ffmpeg/`
+- Show inline download progress (pct + MB) same as RivalsVidMaker `_progress_cb`
+
+**metaflac:**
+- Check: `dependencies/flac/metaflac.exe` exists
+- Download from: `https://github.com/xiph/flac/releases/latest/download/flac-win.zip` (contains `metaflac.exe` and `flac.exe`)
+- Extract: `metaflac.exe` and `flac.exe` into `dependencies/flac/`
+
+**Fallback:** if either download fails, print the manual download URL and exit cleanly. Do not proceed without both binaries.
+
+**Path strategy:** do NOT rely on system PATH. Always call binaries by their full `dependencies/` path. This means the tool works out of the box on any machine without touching PATH.
 
 ---
 
@@ -119,6 +134,8 @@ Done. 3 folders, 34 files. Total: 42.3s
 
 Print a timing summary at the end: total time, scrub time, transcode time.
 
+Pattern to follow: `RivalsVidMaker/src/progress.py` - `AnimatedTicker` class. Animated N/total dots on a background thread via a context manager. Pattern-copy the whole module, it is self-contained and has no dependencies beyond stdlib.
+
 ---
 
 **Log to file**
@@ -131,6 +148,8 @@ Log contents:
 - Per-file result: path, scrub result (ok/skipped/error), transcode result (ok/skipped/error), duration
 - End timestamp
 - Summary: folders processed, files processed, errors, total time
+
+Pattern to follow: `SBS_Download/src/download_sbs.py` `setup_logging()` - dual handler (file + console) via Python `logging` module. Single call at startup wires up both. Pattern-copy the function, no external deps.
 
 ---
 
@@ -169,6 +188,35 @@ Useful for verifying folder mirror paths before a real run.
 `--skip-existing`: if the output MP3 already exists at the destination path, skip that file entirely (no scrub, no transcode).
 
 Log skipped files separately in the summary.
+
+---
+
+**Dataclass config**
+
+Upgrade config from plain dict to a `@dataclass` so fields are typed and IDE-autocomplete works.
+
+Pattern to follow: `RivalsVidMaker/src/config.py` - `@dataclass class Config` + `def load(path) -> Config`. Path fields as `pathlib.Path`, not strings. Validation stays in `load()`.
+
+---
+
+**Lockfile - prevent double-run**
+
+Use a PID-based lockfile to prevent two parallel runs from clobbering the same output files (e.g. run.bat double-clicked).
+
+Pattern to follow: `SpotifyPlaylistGen/src/lockfile.py` - self-contained, stdlib only, handles stale lockfiles (PID no longer running). Pattern-copy wholesale. Lock file goes in `data/flac_flow.lock`.
+
+---
+
+**Windows Terminal run.bat**
+
+Upgrade `scripts/run.bat` to open in Windows Terminal with Git Bash (same as RivalsVidMaker and SBS_Download):
+
+```bat
+@echo off
+wt.exe -p "Git Bash" -d "%~dp0.." "C:\Program Files\Git\bin\bash.exe" --login -i "%~dp0run.sh"
+```
+
+Then add `scripts/run.sh` that calls `python src/flac_flow.py`. Gives a proper terminal vs bare cmd.exe.
 
 ---
 
