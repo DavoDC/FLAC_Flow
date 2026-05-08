@@ -6,7 +6,16 @@ Work organised by explicit safety tiers. Within each tier, items can be done in 
 
 ## TIER 0 (BLOCKING)
 
-None currently.
+**Path and environment validation**
+
+Before processing ANY files, verify the environment is usable:
+1. Windows (or detect Linux/Mac and reject with a message - only Windows for V1)
+2. `config/config.json` exists and is valid JSON
+3. All source folders exist and are readable
+4. `destination_root` parent exists and is writable (can create folders)
+5. Enough disk space in destination (warn if < 10% free, abort if < 1%)
+
+If ANY check fails, print the problem and exit immediately. Do not attempt to process.
 
 ---
 
@@ -153,6 +162,27 @@ Pattern to follow: `SBS_Download/src/download_sbs.py` `setup_logging()` - dual h
 
 ---
 
+**Exit codes**
+
+Return proper exit codes so scripts/batch jobs can detect success/failure:
+- `0` - success (all files processed, no errors)
+- `1` - fatal error (config invalid, dependency missing, disk full, aborted by user)
+- `2` - partial failure (some files errored but run completed, not all could be processed)
+
+---
+
+**Signal handling (Ctrl+C)**
+
+Catch `KeyboardInterrupt` and `SIGINT`. On user interrupt:
+1. Print "Interrupted by user" to console and log
+2. Finish current file if in progress (don't abort mid-transcode)
+3. Print summary of what was completed
+4. Exit with code 1
+
+Don't leave partial MP3 files behind.
+
+---
+
 ## TIER 2 (QUALITY)
 
 ---
@@ -220,6 +250,70 @@ Then add `scripts/run.sh` that calls `python src/flac_flow.py`. Gives a proper t
 
 ---
 
+**Command-line arguments**
+
+Allow overriding config on the command line. Flag format: `--key value`
+
+```
+flac-flow --config /path/to/custom_config.json --quality V2 --dry-run
+```
+
+Supported flags:
+- `--config <path>` - load config from different file (default: `config/config.json`)
+- `--quality <V0|V2|V4>` - override MP3 quality for this run
+- `--since <YYYY-MM-DD>` - only process FLACs modified after this date
+- `--verbose` - print extra debug info
+- `--help` - show usage
+
+Flags override config file values.
+
+---
+
+**Filename edge cases**
+
+Handle special cases in FLAC filenames:
+- Filenames with spaces, accents, emoji, Unicode - transcode correctly with proper escaping
+- Very long filenames (Windows 260-char limit) - truncate output filename if needed, log warning
+- Duplicate filenames across source folders - each gets its own output folder, no collision
+- Read-only source files - log warning, skip that file
+- Symlinks - decide: follow them or skip (recommend follow for music libraries with linked albums)
+
+---
+
+**Statistics summary**
+
+At the end of each run, print stats to console and log:
+
+```
+Statistics:
+  Folders: 3 processed
+  Files: 456 total, 450 succeeded, 6 skipped (read-only), 0 errors
+  Input size: 12.5 GB
+  Output size: 3.2 GB (74% savings)
+  Scrub time: 4m23s
+  Transcode time: 18m45s
+  Total time: 23m8s
+  Avg file time: 3.1s per FLAC
+  Throughput: 1.3 files/sec
+```
+
+---
+
+**ETA and speed display**
+
+During progress, show estimated time remaining:
+
+```
+[2/3 folders] Artist2\Album
+  Processing 450 files
+  [234/450 files] track123.flac ... 1.2s
+  Processed: 52% (234 files)
+  Throughput: 1.4 files/sec
+  ETA: 2m45s remaining
+```
+
+---
+
 **Tests**
 
 - `tests/test_config.py` - valid config loads correctly; missing keys raise; non-existent source folder raises; both options false raises
@@ -263,6 +357,41 @@ Run the conversion in a background thread so the GUI stays responsive.
 **Per-source toggles**
 
 In the source folders list, each row has its own scrub/convert checkboxes, overriding the global options for that folder only.
+
+---
+
+**GUI run history**
+
+Show a list of recent runs (last 10) with:
+- Date and time
+- Number of files processed
+- Success/error count
+- Total duration
+- Click to view detailed log file
+
+---
+
+**GUI settings panel**
+
+Tab or side panel for global options:
+- MP3 quality (V0/V2/V4 radio buttons)
+- Concurrent threads slider (1-8)
+- Scrub art/padding checkbox
+- Convert to MP3 checkbox
+- Verbose logging toggle
+- Save button (writes to config.json)
+
+---
+
+**Drag and drop folders**
+
+Allow dragging folders from Windows Explorer into the source folders list. Automatically adds them to the list.
+
+---
+
+**Cancel button**
+
+During a run, show a Cancel button. Clicking it gracefully stops processing after current file, logs summary, exits.
 
 ---
 
@@ -435,3 +564,88 @@ Option to delete old MP3s if the source FLAC is deleted or moved (keep destinati
 ```
 
 Logs deleted files for safety.
+
+---
+
+**Batch re-encode**
+
+Re-convert existing MP3s to a different bitrate. Useful if Billy wants to:
+- Create a "high-quality" archive (convert V4 back to V0)
+- Create a "portable" version (convert V0 to V4 for storage on phone)
+- Test quality differences
+
+Config flag: `"encode_existing_mp3s": true` (default false).
+
+---
+
+**Web UI / remote access**
+
+Instead of GUI, serve a web interface (Flask) running on `localhost:5000`. Access from phone/tablet on same network:
+- Same source folder picker
+- Same progress display
+- Run history, logs
+
+Useful if Billy's music library is on a server.
+
+---
+
+**Music library integration**
+
+Query external music databases for tag data:
+- MusicBrainz API - look up artist/album and get canonical tags
+- Discogs API - get release info, track numbering
+- Apply these tags to output MP3s automatically
+
+Tag mapping: FLAC vorbis comments -> ID3v2.4 on output MP3.
+
+---
+
+**Statistics dashboard**
+
+After accumulating many conversions, show insights:
+- Total files converted (all time)
+- Total storage saved (input vs output)
+- Most frequently transcoded artist
+- Average transcode time trends (getting faster? slower?)
+- Quality distribution (how many V0, V2, V4)
+
+Store in `data/stats.json`, display in GUI or HTML report.
+
+---
+
+**Plugin system**
+
+Allow custom processing steps:
+- Pre-scrub: custom metadata cleanup scripts
+- Post-transcode: apply custom effects (normalize loudness, add crossfade)
+- Custom tag mapping: user-defined FLAC->ID3 rules
+
+Load plugins from `plugins/` folder. Simple interface: JSON config + Python callable.
+
+---
+
+**Scheduled runs**
+
+Set up cron-like scheduled conversions:
+- Daily at 2am, convert new FLACs added since last run
+- Weekly archive backup to cloud
+- Monthly stats report email
+
+Config: 
+```json
+"scheduled_runs": [
+  {"time": "02:00", "days": ["Mon", "Wed", "Fri"], "action": "convert_new"}
+]
+```
+
+---
+
+**Network/cloud upload**
+
+After successful conversion, upload MP3 to:
+- Nextcloud / OwnCloud server
+- Plex library (add to Plex immediately after conversion)
+- Synology NAS
+- SMB network share
+
+Configurable per source folder.
