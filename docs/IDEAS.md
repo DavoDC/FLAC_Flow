@@ -266,6 +266,108 @@ In the source folders list, each row has its own scrub/convert checkboxes, overr
 
 ---
 
+## TIER 2 (QUALITY) - Additional
+
+---
+
+**Tag preservation**
+
+Copy ID3 tags from source FLAC to output MP3 so the music library stays organized (artist, album, title, track number, etc).
+
+Use `mutagen` library: read FLAC vorbis comments, map to ID3v2 tags, write to MP3. Log any tags that couldn't be preserved.
+
+---
+
+**Concurrent conversion**
+
+Use `concurrent.futures.ThreadPoolExecutor` to process multiple files in parallel. Default: 4 threads (configurable).
+
+Scrubbing stays sequential per file (metaflac is slow), but transcodes can overlap. Speeds up large batches.
+
+---
+
+**Output quality options**
+
+Config option to choose LAME VBR quality: V0 (highest, ~245 kbps), V2 (~190 kbps), V4 (~165 kbps). Useful for different devices or storage constraints.
+
+```json
+"options": {
+  "mp3_quality": "V0"  // or "V2", "V4"
+}
+```
+
+CLI flag: `--quality V2` to override config.
+
+---
+
+**File size report**
+
+After each run, print before/after disk usage:
+```
+Summary:
+  Input:  12.5 GB (456 FLAC files)
+  Output: 3.2 GB (456 MP3 files at V0)
+  Savings: 9.3 GB (74%)
+```
+
+Helps Billy understand storage impact.
+
+---
+
+**Filter by date modified**
+
+Only process FLACs modified after a certain date (useful for incremental updates):
+
+```json
+"options": {
+  "since_date": "2024-01-01"
+}
+```
+
+CLI flag: `--since 2024-01-01`
+
+---
+
+## TIER 3 (FUTURE - GUI) - Additional
+
+---
+
+**Watch folder mode**
+
+Monitor source folders for new FLACs and auto-convert them on arrival (daemon mode). Useful if Billy adds music to his library frequently.
+
+Runs as a background process, checks every N seconds (configurable, default 30s). Logs conversions to `data/logs/watch_YYYYMMDD.log`.
+
+Start with: `flac_flow --watch config/config.json`
+
+---
+
+**Preset configs**
+
+Save/load named config presets in `config/presets/`:
+- "fast" - high bitrate, no scrub
+- "archive" - V2 quality, scrub enabled, checksum log
+- "portable" - V4 quality, smaller files
+
+GUI has a Preset dropdown to load predefined configs quickly.
+
+---
+
+**Before/after preview**
+
+Dry-run output shows a sample conversion (first file only) with actual timings, so user can estimate total time before running full batch.
+
+```
+[DRY RUN - SAMPLE]
+File: track01.flac (12.3 MB)
+  Scrub: 0.5s
+  Transcode: 2.1s
+  Output: track01.mp3 (3.8 MB)
+Total estimated time for 456 files: ~18 minutes
+```
+
+---
+
 ## TIER 4 (SOMEDAY)
 
 ---
@@ -279,3 +381,57 @@ After each transcode, read the output MP3 with a Python ID3 library (e.g. `mutag
 **Checksum log**
 
 After each run, write a sidecar file `data/logs/run_YYYYMMDD_HHMMSS_checksums.txt` with SHA256 hashes of every converted MP3. Allows verification that files haven't been corrupted.
+
+---
+
+**Resume/checkpoint**
+
+If a run is interrupted (crash, manual stop), store checkpoint file `data/flac_flow.checkpoint` with the last successfully converted file. Next run picks up from there instead of restarting.
+
+Useful for very large libraries (thousands of files) where a single run might take hours.
+
+---
+
+**Conversion database**
+
+Store a JSON database in `data/conversion_log.json` mapping source FLAC path -> output MP3 path + conversion timestamp. Lets user query which FLACs were converted when, useful for auditing or re-runs.
+
+```json
+{
+  "C:\\Music\\FLAC\\Artist\\Album\\track.flac": {
+    "output": "C:\\Music\\MP3\\Album\\track.mp3",
+    "converted": "2024-01-15T14:23:45",
+    "input_size": 12345678,
+    "output_size": 3456789
+  }
+}
+```
+
+---
+
+**Cloud sync integration**
+
+Support syncing output MPs to OneDrive/Dropbox after successful conversion (optional, configurable per source folder).
+
+```json
+"source_folders": [
+  {
+    "path": "C:\\Music\\FLAC\\Artist1",
+    "sync_to_cloud": "onedrive"
+  }
+]
+```
+
+---
+
+**Auto-cleanup old outputs**
+
+Option to delete old MP3s if the source FLAC is deleted or moved (keep destination in sync with source).
+
+```json
+"options": {
+  "cleanup_orphaned_mp3s": true
+}
+```
+
+Logs deleted files for safety.
