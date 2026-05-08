@@ -1,0 +1,12 @@
+{
+  "_comment": "Copy this file to config.json and edit with your paths. config.json is gitignored.",
+  "source_folders": [
+    "C:\\Music\\FLAC\\Artist1\\Album1",
+    "C:\\Music\\FLAC\\Artist2"
+  ],
+  "destination_root": "C:\\Music\\MP3",
+  "options": {
+    "scrub_art_and_padding": true,
+    "convert_to_mp3": true
+  }
+}

@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.env
+.venv
+venv/
+*.egg
+
+# User config (contains personal paths)
+config/config.json
+
+# Runtime data
+data/logs/*
+data/output/*
+!data/logs/.gitkeep
+!data/output/.gitkeep
+
+# IDE
+.idea/
+.vscode/
+*.suo
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
