@@ -2,184 +2,7 @@
 
 Work organised by explicit safety tiers. Within each tier, items can be done in any order. Do not move to the next tier until current tier is verified on real data.
 
----
-
-## TIER 0 (BLOCKING)
-
-**Path and environment validation**
-
-Before processing ANY files, verify the environment is usable:
-1. Windows (or detect Linux/Mac and reject with a message - only Windows for V1)
-2. `config/config.json` exists and is valid JSON
-3. All source folders exist and are readable
-4. `destination_root` parent exists and is writable (can create folders)
-5. Enough disk space in destination (warn if < 10% free, abort if < 1%)
-
-If ANY check fails, print the problem and exit immediately. Do not attempt to process.
-
----
-
-## TIER 1 (MVP) - Config-based CLI
-
----
-
-**Config loader**
-
-Read and validate `config/config.json` on startup. Expected shape:
-
-```json
-{
-  "source_folders": ["C:\\Music\\FLAC\\Artist"],
-  "destination_root": "C:\\Music\\MP3",
-  "options": {
-    "scrub_art_and_padding": true,
-    "convert_to_mp3": true
-  }
-}
-```
-
-Validation rules:
-- `source_folders` must be a non-empty list of strings
-- Each source folder must exist on disk
-- `destination_root` must be a non-empty string (need not exist yet - create it)
-- At least one of `scrub_art_and_padding` or `convert_to_mp3` must be true
-
-On failure: print a clear message (missing key, wrong type, folder not found), then exit. Do not process any files.
-
----
-
-**Auto-download dependencies**
-
-On startup, check if `ffmpeg.exe` and `metaflac.exe` exist in `dependencies/`. If missing, download and extract them automatically - no manual install required.
-
-Pattern to follow: `RivalsVidMaker/src/ffmpeg_setup.py` (already working, pattern-copy it).
-
-Module: `src/deps.py`
-
-**FFmpeg:**
-- Check: `dependencies/ffmpeg/ffmpeg.exe` exists
-- Download from: `https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip`
-- Extract: `ffmpeg.exe`, `ffprobe.exe`, `ffplay.exe` into `dependencies/ffmpeg/`
-- Show inline download progress (pct + MB) same as RivalsVidMaker `_progress_cb`
-
-**metaflac:**
-- Check: `dependencies/flac/metaflac.exe` exists
-- Download from: `https://github.com/xiph/flac/releases/latest/download/flac-win.zip` (contains `metaflac.exe` and `flac.exe`)
-- Extract: `metaflac.exe` and `flac.exe` into `dependencies/flac/`
-
-**Fallback:** if either download fails, print the manual download URL and exit cleanly. Do not proceed without both binaries.
-
-**Path strategy:** do NOT rely on system PATH. Always call binaries by their full `dependencies/` path. This means the tool works out of the box on any machine without touching PATH.
-
----
-
-**Scrub step**
-
-Modifies FLAC files in-place. Must run before transcode (smaller file = faster encode).
-
-Per file, in order:
-```
-metaflac --remove --block-type=PICTURE --dont-use-padding <file>
-metaflac --remove --block-type=PADDING --dont-use-padding <file>
-metaflac --add-padding=8192 <file>
-```
-
-The `--dont-use-padding` flag forces a full rewrite rather than zero-filling the removed blocks, so the file actually shrinks. The final `--add-padding=8192` leaves a small standard padding block so future tag editors don't have to rewrite the entire file.
-
-If `scrub_art_and_padding` is false in config, skip this step entirely.
-
----
-
-**Transcode step**
-
-Convert each FLAC to MP3 VBR V0 (highest VBR quality) using LAME via FFmpeg:
-
-```
-ffmpeg -i <input.flac> -codec:a libmp3lame -qscale:a 0 <output.mp3>
-```
-
-- Output filename: same basename as input, extension changed to `.mp3`
-- Output path: determined by folder mirror logic (see below)
-- If `convert_to_mp3` is false in config, skip this step entirely
-
----
-
-**Folder mirror logic**
-
-For each entry in `source_folders`, the leaf folder name is reproduced under `destination_root`.
-
-Example:
-```
-source_folders: ["C:\\Music\\FLAC\\Artist1\\Album"]
-destination_root: "C:\\Music\\MP3"
-
-Input:  C:\Music\FLAC\Artist1\Album\track01.flac
-Output: C:\Music\MP3\Album\track01.mp3
-```
-
-If source has nested subfolders, mirror the full subtree:
-```
-Input:  C:\Music\FLAC\Artist1\Album\Disc1\track01.flac
-Output: C:\Music\MP3\Album\Disc1\track01.mp3
-```
-
-Create output directories as needed before writing. Never delete or overwrite existing output files without the `--skip-existing` flag logic (TIER 2).
-
----
-
-**Progress output**
-
-Print to stdout during the run. Format:
-
-```
-[1/3 folders] Artist1\Album
-  [1/12 files] track01.flac ... done (1.2s)
-  [2/12 files] track02.flac ... done (1.1s)
-  ...
-[2/3 folders] Artist2
-  ...
-Done. 3 folders, 34 files. Total: 42.3s
-```
-
-Print a timing summary at the end: total time, scrub time, transcode time.
-
-Pattern to follow: `RivalsVidMaker/src/progress.py` - `AnimatedTicker` class. Animated N/total dots on a background thread via a context manager. Pattern-copy the whole module, it is self-contained and has no dependencies beyond stdlib.
-
----
-
-**Log to file**
-
-Write a log to `data/logs/run_YYYYMMDD_HHMMSS.log` for every run.
-
-Log contents:
-- Start timestamp
-- Config loaded (source folders, destination root, options)
-- Per-file result: path, scrub result (ok/skipped/error), transcode result (ok/skipped/error), duration
-- End timestamp
-- Summary: folders processed, files processed, errors, total time
-
-Pattern to follow: `SBS_Download/src/download_sbs.py` `setup_logging()` - dual handler (file + console) via Python `logging` module. Single call at startup wires up both. Pattern-copy the function, no external deps.
-
----
-
-**Exit codes**
-
-Return proper exit codes so scripts/batch jobs can detect success/failure:
-- `0` - success (all files processed, no errors)
-- `1` - fatal error (config invalid, dependency missing, disk full, aborted by user)
-- `2` - partial failure (some files errored but run completed, not all could be processed)
-
----
-
-**Signal handling (Ctrl+C)**
-
-Catch `KeyboardInterrupt` and `SIGINT`. On user interrupt:
-1. Print "Interrupted by user" to console and log
-2. Finish current file if in progress (don't abort mid-transcode)
-3. Print summary of what was completed
-4. Exit with code 1
-
-Don't leave partial MP3 files behind.
+TIER 0 and TIER 1 are complete - see HISTORY.md.
 
 ---
 
@@ -325,6 +148,64 @@ Use `unittest.mock.patch('subprocess.run')` to avoid needing real ffmpeg/metafla
 
 ---
 
+**Tag preservation**
+
+Copy ID3 tags from source FLAC to output MP3 so the music library stays organized (artist, album, title, track number, etc).
+
+Use `mutagen` library: read FLAC vorbis comments, map to ID3v2 tags, write to MP3. Log any tags that couldn't be preserved.
+
+---
+
+**Concurrent conversion**
+
+Use `concurrent.futures.ThreadPoolExecutor` to process multiple files in parallel. Default: 4 threads (configurable).
+
+Scrubbing stays sequential per file (metaflac is slow), but transcodes can overlap. Speeds up large batches.
+
+---
+
+**Output quality options**
+
+Config option to choose LAME VBR quality: V0 (highest, ~245 kbps), V2 (~190 kbps), V4 (~165 kbps). Useful for different devices or storage constraints.
+
+```json
+"options": {
+  "mp3_quality": "V0"  // or "V2", "V4"
+}
+```
+
+CLI flag: `--quality V2` to override config.
+
+---
+
+**File size report**
+
+After each run, print before/after disk usage:
+```
+Summary:
+  Input:  12.5 GB (456 FLAC files)
+  Output: 3.2 GB (456 MP3 files at V0)
+  Savings: 9.3 GB (74%)
+```
+
+Helps Billy understand storage impact.
+
+---
+
+**Filter by date modified**
+
+Only process FLACs modified after a certain date (useful for incremental updates):
+
+```json
+"options": {
+  "since_date": "2024-01-01"
+}
+```
+
+CLI flag: `--since 2024-01-01`
+
+---
+
 ## TIER 3 (FUTURE - GUI)
 
 ---
@@ -392,68 +273,6 @@ Allow dragging folders from Windows Explorer into the source folders list. Autom
 **Cancel button**
 
 During a run, show a Cancel button. Clicking it gracefully stops processing after current file, logs summary, exits.
-
----
-
-## TIER 2 (QUALITY) - Additional
-
----
-
-**Tag preservation**
-
-Copy ID3 tags from source FLAC to output MP3 so the music library stays organized (artist, album, title, track number, etc).
-
-Use `mutagen` library: read FLAC vorbis comments, map to ID3v2 tags, write to MP3. Log any tags that couldn't be preserved.
-
----
-
-**Concurrent conversion**
-
-Use `concurrent.futures.ThreadPoolExecutor` to process multiple files in parallel. Default: 4 threads (configurable).
-
-Scrubbing stays sequential per file (metaflac is slow), but transcodes can overlap. Speeds up large batches.
-
----
-
-**Output quality options**
-
-Config option to choose LAME VBR quality: V0 (highest, ~245 kbps), V2 (~190 kbps), V4 (~165 kbps). Useful for different devices or storage constraints.
-
-```json
-"options": {
-  "mp3_quality": "V0"  // or "V2", "V4"
-}
-```
-
-CLI flag: `--quality V2` to override config.
-
----
-
-**File size report**
-
-After each run, print before/after disk usage:
-```
-Summary:
-  Input:  12.5 GB (456 FLAC files)
-  Output: 3.2 GB (456 MP3 files at V0)
-  Savings: 9.3 GB (74%)
-```
-
-Helps Billy understand storage impact.
-
----
-
-**Filter by date modified**
-
-Only process FLACs modified after a certain date (useful for incremental updates):
-
-```json
-"options": {
-  "since_date": "2024-01-01"
-}
-```
-
-CLI flag: `--since 2024-01-01`
 
 ---
 
