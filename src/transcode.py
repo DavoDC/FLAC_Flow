@@ -28,7 +28,7 @@ def transcode_file(
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     cmd = build_transcode_command(file_path, output_path, ffmpeg_exe)
-    result = subprocess.run(cmd, capture_output=True)
+    result = subprocess.run(cmd, capture_output=True, stdin=subprocess.DEVNULL)
     if result.returncode != 0:
         stderr = result.stderr.decode(errors="replace")
         logging.error("ffmpeg failed on %s: %s", file_path.name, stderr.strip())
