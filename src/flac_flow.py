@@ -100,17 +100,17 @@ def main() -> None:
     _validate_destination(config.destination_root)
 
     if config.scrub_art_and_padding and not args.no_confirm:
+        import msvcrt
         print("Warning: scrub_art_and_padding is enabled.")
         print("Source FLAC files will be modified in-place.")
         print("Album art and padding will be permanently removed.")
-        print("Make sure you have a backup. Ctrl+C to abort.")
-        try:
-            for i in range(5, 0, -1):
-                print(f"\r  Starting in {i}s... ", end="", flush=True)
-                time.sleep(1)
-            print("\r                      ")
-        except KeyboardInterrupt:
-            print("\nAborted.")
+        print("Make sure you have a backup.")
+        print()
+        print("Press Y to continue or any other key to abort: ", end="", flush=True)
+        ch = msvcrt.getwch()
+        print()
+        if ch.lower() != "y":
+            print("Aborted.")
             sys.exit(0)
         print()
 

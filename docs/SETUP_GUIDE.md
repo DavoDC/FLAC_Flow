@@ -55,7 +55,7 @@ Open `config.json` in a text editor and set your paths:
 
 | Option | What it does |
 |--------|-------------|
-| `scrub_art_and_padding` | Permanently removes embedded album art and padding from source FLACs before converting. Saves space. Make sure you have a backup before enabling this - the program gives you a 5-second warning to abort before it starts. |
+| `scrub_art_and_padding` | Permanently removes embedded album art and padding from source FLACs before converting. Saves space. Make sure you have a backup before enabling this - the program warns you and asks you to press Y to confirm before it starts. |
 | `convert_to_mp3` | Converts each FLAC to MP3 V0 (highest quality VBR). |
 
 Your `config.json` is never touched by updates, so you only set this up once.
