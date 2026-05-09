@@ -44,7 +44,7 @@ This downloads everything into a `FLAC_Flow` folder. You only ever do this once.
 
 Open the `FLAC_Flow` folder. Go into `config\`. Copy `config.example.json` and rename the copy to `config.json`.
 
-Open `config.json` in a text editor and set your paths:
+Open `config.json` in a text editor: right-click the file and choose **Open with > Notepad** (or VS Code if you have it). Set your paths:
 
 - `source_folders` - folder(s) containing your FLAC files (scanned recursively)
 - `destination_root` - where converted MP3s will be saved

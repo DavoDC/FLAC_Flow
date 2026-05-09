@@ -1,60 +1,23 @@
 # Dependencies
 
-FLAC_Flow requires three external tools on your system PATH.
+FFmpeg and metaflac are downloaded automatically by FLAC Flow on first run. You do not need to install anything manually.
+
+They are saved to this folder (`dependencies/`) and used directly by the program. No PATH changes required.
 
 ---
 
-## 1. Python 3.x
+## Manual install (if auto-download fails)
 
-Download from https://python.org/downloads/
+If the automatic download fails, you can place the files here manually.
 
-During install, tick "Add Python to PATH". Verify with:
-```
-python --version
-```
+### FFmpeg
 
----
+Download a Windows build from https://ffmpeg.org/download.html (choose "Windows builds from gyan.dev", essentials build).
 
-## 2. FFmpeg (includes LAME encoding support)
+Extract and copy `ffmpeg.exe`, `ffprobe.exe`, and `ffplay.exe` into `dependencies/ffmpeg/`.
 
-1. Download a Windows build from https://ffmpeg.org/download.html (choose "Windows builds from gyan.dev" or "BtbN builds")
-2. Extract the zip
-3. Add the `bin/` folder inside the extracted directory to your system PATH
-4. Verify with: `ffmpeg -version`
+### metaflac
 
-FFmpeg includes libmp3lame (LAME encoder) in the standard Windows builds - no separate LAME download needed.
+Download the latest Windows release from https://github.com/xiph/flac/releases/latest (the file ending in `-win.zip`).
 
----
-
-## 3. FLAC tools (metaflac)
-
-`metaflac.exe` is the metadata editor used to scrub album art and padding blocks.
-
-1. Download from https://xiph.org/flac/download.html (Windows binary)
-2. Extract and place `metaflac.exe` (and `flac.exe`) in a folder on your PATH
-3. Verify with: `metaflac --version`
-
----
-
-## PATH setup on Windows
-
-If you're not sure how to add a folder to PATH:
-
-1. Press Win+R, type `sysdm.cpl`, press Enter
-2. Advanced tab -> Environment Variables
-3. Under "System variables", find `Path`, click Edit
-4. Add the folder containing your executable
-5. Click OK, then open a new terminal to test
-
----
-
-## Verify all tools
-
-Run this in a terminal after setup:
-```
-python --version
-ffmpeg -version
-metaflac --version
-```
-
-All three should print version info with no errors. FLAC_Flow will also check these on startup.
+Extract and copy `metaflac.exe`, `flac.exe`, `libFLAC.dll`, and `libFLAC++.dll` into `dependencies/flac/`.
