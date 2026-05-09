@@ -74,6 +74,10 @@ Config lives at `config/config.json` (gitignored). Copy from `config.example.jso
 - Source: `source_folders[0]/Album/` -> output: `destination_root/Album/`
 - The leaf folder name from the source entry is mirrored, not the full path
 
+## Running the Program
+
+**Always tell the user to run via `scripts\run.bat`.** Never suggest `python src\flac_flow.py` or any command-line invocation. run.bat is the intended entry point for all users.
+
 ## Development Rules
 
 - TDD: write tests first for all new modules
