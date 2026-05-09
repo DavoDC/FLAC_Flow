@@ -1,65 +1,64 @@
-# FLAC Flow - Setup Guide (Beginner)
+# FLAC Flow - Setup Guide
 
-This guide covers everything from scratch. No accounts required for any step.
+No accounts required at any step. Setup takes about 10 minutes and you never have to do it again.
 
 ---
 
-## Prerequisites (install once)
-
-### Git
-
-Git is what you use to download FLAC Flow and keep it updated.
+## Step 1 - Install Git
 
 Download: https://git-scm.com/download/win
 
-Run the installer. All defaults are fine.
+Run the installer, all defaults are fine.
 
-### Python 3
-
-Download: https://www.python.org/downloads/
-
-Run the installer. On the first screen, tick **"Add Python to PATH"** before clicking Install. This is important.
+Git is what lets you download FLAC Flow and get future updates instantly - no re-downloading zip files, no visiting websites. One command and you have the latest version.
 
 ---
 
-## First-time setup
+## Step 2 - Install Python
 
-### 1. Choose where to put FLAC Flow
+Download: https://www.python.org/downloads/
 
-Open File Explorer and navigate to a folder where you want FLAC Flow to live, e.g. `C:\Tools\`.
+Run the installer. On the first screen, tick **"Add Python to PATH"** before clicking Install.
 
-Right-click in an empty area inside that folder and choose **"Open Git Bash here"**.
+Python is the language FLAC Flow is written in. Ticking "Add to PATH" means Windows can find it automatically.
 
-A terminal window opens.
+---
 
-### 2. Download FLAC Flow
+## Step 3 - Download FLAC Flow
 
-In the Git Bash window, type exactly:
+Open File Explorer and go to a folder where you want FLAC Flow to live, e.g. `C:\Tools\`.
+
+Right-click in an empty area and choose **"Open Git Bash here"**. A terminal window opens.
+
+Type this exactly and press Enter:
 
     git clone https://github.com/DavoDC/FLAC_Flow
 
-Press Enter. This creates a `FLAC_Flow` folder containing everything.
+This downloads everything into a `FLAC_Flow` folder. You only ever do this once.
 
-### 3. Set up your config file
+---
 
-Open the `FLAC_Flow` folder in File Explorer. Go into the `config` subfolder.
+## Step 4 - Configure your folders
 
-Copy `config.example.json` and rename the copy to `config.json`.
+Open the `FLAC_Flow` folder. Go into `config\`. Copy `config.example.json` and rename the copy to `config.json`.
 
-Open `config.json` in a text editor (Notepad works, or use VS Code if you have it).
+Open `config.json` in a text editor and set your paths:
 
-Edit the file to match your folders:
+- `source_folders` - folder(s) containing your FLAC files (scanned recursively)
+- `destination_root` - where converted MP3s will be saved
 
-- `source_folders` - the folder(s) containing your FLAC files
-- `destination_root` - where converted MP3s should go
-
-**Path format:** use double backslashes inside the quotes, e.g:
+**Path tip:** paths inside JSON need double backslashes. If you have VS Code, just paste a Windows path and it fixes them automatically. Without VS Code, double every backslash manually:
 
     "C:\\Music\\FLAC\\MyAlbums"
 
-VS Code makes this easy - paste a Windows path inside the quotes and it automatically doubles the backslashes for you.
+**Options:**
 
-**Scrub warning:** if `scrub_art_and_padding` is set to `true`, the program permanently removes album art and padding from your source FLAC files. Make sure you have a backup of your FLACs before using this option. The program will warn you and give you 5 seconds to abort (Ctrl+C) before it starts.
+| Option | What it does |
+|--------|-------------|
+| `scrub_art_and_padding` | Permanently removes embedded album art and padding from source FLACs before converting. Saves space. Make sure you have a backup before enabling this - the program gives you a 5-second warning to abort before it starts. |
+| `convert_to_mp3` | Converts each FLAC to MP3 V0 (highest quality VBR). |
+
+Your `config.json` is never touched by updates, so you only set this up once.
 
 ---
 
@@ -67,7 +66,7 @@ VS Code makes this easy - paste a Windows path inside the quotes and it automati
 
 Double-click `scripts\run.bat`.
 
-The first run downloads FFmpeg and metaflac automatically (about 120 MB total). This only happens once. After that, runs start straight away.
+The first run automatically downloads FFmpeg and metaflac (~120 MB total) - no hunting for software, no manual installs. Every run after that starts immediately.
 
 ---
 
@@ -75,20 +74,20 @@ The first run downloads FFmpeg and metaflac automatically (about 120 MB total). 
 
 When there is a new version, double-click `scripts\update.bat`.
 
-That's it. Your `config.json` is never overwritten by updates.
+That's it. Git fetches only what changed - it's fast, and your config is never touched.
 
 ---
 
 ## Troubleshooting
 
-**The window closes immediately when I double-click run.bat**
-- Python may not be installed, or "Add Python to PATH" was not ticked during install. Reinstall Python and tick that option.
+**Window closes immediately on double-click**
+Python is not installed or "Add Python to PATH" was not ticked. Reinstall Python and make sure to tick that option.
 
 **"No module named..." error**
-- Same as above - Python PATH issue.
+Same fix - Python PATH issue.
 
-**Metaflac or FFmpeg download fails**
-- Check your internet connection. The downloads are from ffmpeg.org and github.com. If they continue to fail, you can download them manually - see `dependencies\README.md` for instructions.
+**FFmpeg or metaflac download fails**
+Check your internet connection. If it keeps failing, see `dependencies\README.md` for manual install instructions.
 
-**Paths not found / config errors**
-- Check that your paths in `config.json` use double backslashes and that the folders actually exist.
+**Config errors / paths not found**
+Check that paths in `config.json` use double backslashes and that the folders actually exist on your machine.
