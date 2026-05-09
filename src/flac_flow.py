@@ -101,11 +101,14 @@ def main() -> None:
 
     if config.scrub_art_and_padding and not args.no_confirm:
         print("Warning: scrub_art_and_padding is enabled.")
-        print("Source FLAC files will be modified in-place - album art and")
-        print("padding will be permanently removed. Make sure you have a backup.")
-        print()
+        print("Source FLAC files will be modified in-place.")
+        print("Album art and padding will be permanently removed.")
+        print("Make sure you have a backup. Ctrl+C to abort.")
         try:
-            input("Press Enter to continue or Ctrl+C to cancel... ")
+            for i in range(5, 0, -1):
+                print(f"\r  Starting in {i}s... ", end="", flush=True)
+                time.sleep(1)
+            print("\r                      ")
         except KeyboardInterrupt:
             print("\nAborted.")
             sys.exit(0)
