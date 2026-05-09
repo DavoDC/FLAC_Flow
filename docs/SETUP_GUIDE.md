@@ -73,9 +73,7 @@ The first run downloads FFmpeg and metaflac automatically (about 120 MB total). 
 
 ## Getting updates
 
-When a new version is available, open Git Bash in the FLAC_Flow folder and run:
-
-    git pull
+When there is a new version, double-click `scripts\update.bat`.
 
 That's it. Your `config.json` is never overwritten by updates.
 
