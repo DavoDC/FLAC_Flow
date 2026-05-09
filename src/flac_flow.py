@@ -101,10 +101,8 @@ def main() -> None:
 
     if config.scrub_art_and_padding and not args.no_confirm:
         import msvcrt
-        print("Warning: scrub_art_and_padding is enabled.")
-        print("Source FLAC files will be modified in-place.")
-        print("Album art and padding will be permanently removed.")
-        print("Make sure you have a backup.")
+        print("Warning: scrub_art_and_padding is enabled. Source FLAC files will be modified in-place.")
+        print("Album art and padding will be permanently removed. Make sure you have a backup.")
         print()
         print("Press Y to continue or any other key to abort: ", end="", flush=True)
         ch = msvcrt.getwch()
@@ -112,7 +110,6 @@ def main() -> None:
         if ch.lower() != "y":
             print("Aborted.")
             sys.exit(0)
-        print()
 
     ffmpeg_exe, metaflac_exe = ensure_deps()
     print()
@@ -189,12 +186,14 @@ def main() -> None:
     )
 
     if t_scrub > 0 or t_transcode > 0:
-        print(f"  Scrub: {_fmt(t_scrub)}  |  Transcode: {_fmt(t_transcode)}")
+        print(f"Scrub: {_fmt(t_scrub)}  |  Transcode: {_fmt(t_transcode)}")
 
     if error_files:
-        print(f"  Errors: {error_files} file(s) failed - see log for details.")
+        print(f"Errors: {error_files} file(s) failed - see log for details.")
 
-    print(f"  Log: {log_file}")
+    print(f"\nLog: {log_file}")
+    print()
+    print("Finished!")
 
     logging.info(
         "Run complete: %d files, %d errors, scrub=%.1fs, transcode=%.1fs, total=%.1fs",
