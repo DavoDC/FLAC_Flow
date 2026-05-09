@@ -188,7 +188,7 @@ Summary:
   Savings: 9.3 GB (74%)
 ```
 
-Helps Billy understand storage impact.
+Shows storage impact at a glance.
 
 ---
 
@@ -282,7 +282,7 @@ During a run, show a Cancel button. Clicking it gracefully stops processing afte
 
 **Watch folder mode**
 
-Monitor source folders for new FLACs and auto-convert them on arrival (daemon mode). Useful if Billy adds music to his library frequently.
+Monitor source folders for new FLACs and auto-convert them on arrival (daemon mode). Useful for libraries that receive frequent additions.
 
 Runs as a background process, checks every N seconds (configurable, default 30s). Logs conversions to `data/logs/watch_YYYYMMDD.log`.
 
@@ -388,7 +388,7 @@ Logs deleted files for safety.
 
 **Batch re-encode**
 
-Re-convert existing MP3s to a different bitrate. Useful if Billy wants to:
+Re-convert existing MP3s to a different bitrate. Use cases:
 - Create a "high-quality" archive (convert V4 back to V0)
 - Create a "portable" version (convert V0 to V4 for storage on phone)
 - Test quality differences
@@ -404,7 +404,7 @@ Instead of GUI, serve a web interface (Flask) running on `localhost:5000`. Acces
 - Same progress display
 - Run history, logs
 
-Useful if Billy's music library is on a server.
+Useful if the music library lives on a NAS or server.
 
 ---
 

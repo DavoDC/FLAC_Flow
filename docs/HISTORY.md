@@ -28,5 +28,5 @@ Implemented all TIER 0 blocking checks and TIER 1 MVP modules in one session. Th
 **Design decisions:**
 - File-only logging (no stream handler) keeps progress output clean and uncluttered
 - `transcode_file` accepts source_folder for mirror_path computation - keeps mirror logic in one place
-- run.bat uses `cmd /k` - window stays open after run so Billy can see the summary
+- run.bat uses `cmd /k` - window stays open after run so the user can read the summary
 - Dependencies gitignored - auto-downloaded fresh on any machine, no binary bloat in repo
