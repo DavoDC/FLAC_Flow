@@ -37,11 +37,7 @@ Without VS Code, you need to manually double every backslash:
 
 **4. Run**
 
-Double-click `scripts\run.bat`, or from a terminal:
-
-```
-python src\flac_flow.py
-```
+Double-click `scripts\run.bat`.
 
 On first run it downloads FFmpeg (~120 MB) and metaflac automatically. Subsequent runs start immediately.
 
