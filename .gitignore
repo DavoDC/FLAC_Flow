@@ -19,6 +19,7 @@ data/output/*
 !data/logs/.gitkeep
 !data/output/.gitkeep
 /data/test_data
+/data/test_data_backup
 
 # Auto-downloaded binaries (re-downloaded on first run)
 dependencies/ffmpeg/*.exe
