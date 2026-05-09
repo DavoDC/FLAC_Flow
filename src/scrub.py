@@ -11,7 +11,7 @@ def build_scrub_commands(file_path: Path, metaflac_exe: Path) -> List[List[str]]
     return [
         [m, "--remove", "--block-type=PICTURE", "--dont-use-padding", f],
         [m, "--remove", "--block-type=PADDING", "--dont-use-padding", f],
-        [m, "--add-padding=8192", f],
+        [m, "--add-padding=4096", f],
     ]
 
 

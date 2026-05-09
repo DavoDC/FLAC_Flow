@@ -28,8 +28,8 @@ data/input/*
 /data/test_data_backup
 
 # Auto-downloaded binaries (re-downloaded on first run)
-dependencies/ffmpeg/*.exe
-dependencies/flac/*.exe
+dependencies/ffmpeg/
+dependencies/flac/
 
 # IDE
 .idea/

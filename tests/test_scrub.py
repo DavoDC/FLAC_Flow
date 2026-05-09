@@ -14,7 +14,7 @@ def test_correct_metaflac_commands_built():
     assert "--dont-use-padding" in cmds[0]
     assert "--block-type=PADDING" in cmds[1]
     assert "--dont-use-padding" in cmds[1]
-    assert any("--add-padding=8192" in arg for arg in cmds[2])
+    assert any("--add-padding=4096" in arg for arg in cmds[2])
 
 
 def test_scrub_order_picture_then_padding_then_add():

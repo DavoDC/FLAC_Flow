@@ -20,7 +20,7 @@ FLAC_DIR = _REPO_ROOT / "dependencies" / "flac"
 _FFMPEG_URL = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
 _FFMPEG_BINS = {"ffmpeg.exe", "ffprobe.exe", "ffplay.exe"}
 
-_METAFLAC_BINS = {"metaflac.exe", "flac.exe"}
+_METAFLAC_BINS = {"metaflac.exe", "flac.exe", "libFLAC.dll", "libFLAC++.dll"}
 
 
 def ensure_deps() -> Tuple[Path, Path]:
