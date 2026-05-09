@@ -19,6 +19,8 @@ That's it. FFmpeg and metaflac are downloaded automatically to the `dependencies
 
 ## Setup
 
+> New to git or Python? See [docs/SETUP_GUIDE.md](docs/SETUP_GUIDE.md) for step-by-step instructions.
+
 **1. Clone or download the repo**
 
 **2. Copy the example config**
