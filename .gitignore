@@ -18,6 +18,12 @@ data/logs/*
 data/output/*
 !data/logs/.gitkeep
 !data/output/.gitkeep
+
+# Working test input (consumed by scrub - re-copy from test_data/before_and_after before each run)
+data/input/*
+!data/input/.gitkeep
+
+# Test data - never committed. before_and_after is the gold standard, NEVER point config at it
 /data/test_data
 /data/test_data_backup
 
