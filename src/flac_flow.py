@@ -77,6 +77,7 @@ def _fmt(seconds: float) -> str:
 
 
 def main() -> None:
+    global _interrupted
     _validate_platform()
 
     log_file = setup_logging()
