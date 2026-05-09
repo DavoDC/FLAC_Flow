@@ -5,6 +5,7 @@ Batch converts FLAC files to MP3 (VBR V0) with optional art/padding scrub.
 Config-driven: reads config/config.json on startup.
 """
 
+import argparse
 import os
 import shutil
 import signal
@@ -76,9 +77,17 @@ def _fmt(seconds: float) -> str:
     return f"{seconds:.1f}s"
 
 
+def _parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--no-confirm", action="store_true")
+    args, _ = parser.parse_known_args()
+    return args
+
+
 def main() -> None:
     global _interrupted
     _validate_platform()
+    args = _parse_args()
 
     log_file = setup_logging()
 
@@ -89,6 +98,18 @@ def main() -> None:
 
     config = load_config()
     _validate_destination(config.destination_root)
+
+    if config.scrub_art_and_padding and not args.no_confirm:
+        print("Warning: scrub_art_and_padding is enabled.")
+        print("Source FLAC files will be modified in-place - album art and")
+        print("padding will be permanently removed. Make sure you have a backup.")
+        print()
+        try:
+            input("Press Enter to continue or Ctrl+C to cancel... ")
+        except KeyboardInterrupt:
+            print("\nAborted.")
+            sys.exit(0)
+        print()
 
     ffmpeg_exe, metaflac_exe = ensure_deps()
     print()
