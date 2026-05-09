@@ -28,7 +28,7 @@ Python is the language FLAC Flow is written in. Ticking "Add to PATH" means Wind
 
 Open File Explorer and go to a folder where you want FLAC Flow to live, e.g. `C:\Tools\`.
 
-Right-click in an empty area and choose **"Open Git Bash here"**. A terminal window opens.
+Click the **address bar** at the top (where it shows the folder path), type `cmd`, and press Enter. A Command Prompt window opens in that folder.
 
 Type this exactly and press Enter:
 
