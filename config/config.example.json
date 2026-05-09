@@ -1,5 +1,4 @@
 {
-  "_comment": "Copy this file to config.json and edit with your paths. config.json is gitignored.",
   "source_folders": [
     "C:\\Music\\FLAC\\Artist1\\Album1",
     "C:\\Music\\FLAC\\Artist2"
