@@ -20,7 +20,6 @@ FLAC_DIR = _REPO_ROOT / "dependencies" / "flac"
 _FFMPEG_URL = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
 _FFMPEG_BINS = {"ffmpeg.exe", "ffprobe.exe", "ffplay.exe"}
 
-_METAFLAC_URL = "https://github.com/xiph/flac/releases/latest/download/flac-win.zip"
 _METAFLAC_BINS = {"metaflac.exe", "flac.exe"}
 
 
@@ -57,13 +56,34 @@ def _ensure_metaflac(flac_dir: Path) -> bool:
         return True
     print("metaflac not found - downloading...")
     logging.info("metaflac not found at %s - downloading...", flac_dir)
+    url = _resolve_metaflac_url()
+    if not url:
+        print("Error: Could not resolve metaflac download URL.")
+        print("Download manually from https://github.com/xiph/flac/releases/latest")
+        print(f"Extract metaflac.exe and flac.exe into {flac_dir}")
+        return False
     return _download_and_extract(
-        url=_METAFLAC_URL,
+        url=url,
         dest_dir=flac_dir,
         bins=_METAFLAC_BINS,
         name="FLAC tools",
-        manual_url="https://xiph.org/flac/download.html",
+        manual_url="https://github.com/xiph/flac/releases/latest",
     )
+
+
+def _resolve_metaflac_url() -> str:
+    """Use the GitHub API to find the latest FLAC Windows zip download URL."""
+    import json
+    api = "https://api.github.com/repos/xiph/flac/releases/latest"
+    try:
+        with urllib.request.urlopen(api, timeout=10) as resp:
+            data = json.loads(resp.read())
+        for asset in data.get("assets", []):
+            if asset["name"].endswith("-win.zip"):
+                return asset["browser_download_url"]
+    except Exception as e:
+        logging.error("Could not resolve metaflac URL from GitHub API: %s", e)
+    return ""
 
 
 def _download_and_extract(
