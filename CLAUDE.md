@@ -64,9 +64,9 @@ Config lives at `config/config.json` (gitignored). Copy from `config.example.jso
 **Scrub order (must happen first):**
 1. `metaflac --remove --block-type=PICTURE --dont-use-padding <file>`
 2. `metaflac --remove --block-type=PADDING --dont-use-padding <file>`
-3. `metaflac --add-padding=8192 <file>`
+3. `metaflac --add-padding=4096 <file>`
 
-Note on padding: the `--add-padding=8192` step leaves an 8 KiB padding block. This is considered effectively "removed" in practice - the standard recommendation is a small padding block (4-8 KiB) so future tag editors don't have to rewrite the entire file. The gold standard test data (`before_and_after`) reflects this: the "after" FLAC has ~4 KiB padding, not zero.
+Note on padding: the `--add-padding=4096` step leaves a 4 KiB padding block. This is considered effectively "removed" in practice - a small padding block prevents future tag editors from having to rewrite the entire file. The gold standard test data (`before_and_after`) reflects this: the "after" FLAC has 4 KiB padding, not zero.
 
 **Transcode:**
 - `ffmpeg -i <input.flac> -codec:a libmp3lame -qscale:a 0 <output.mp3>`
@@ -78,7 +78,9 @@ Note on padding: the `--add-padding=8192` step leaves an 8 KiB padding block. Th
 
 ## Running the Program
 
-**Always tell the user to run via `scripts\run.bat`.** Never suggest `python src\flac_flow.py` or any command-line invocation. run.bat is the intended entry point for all users.
+**Users always run via `scripts\run.bat`.** Never suggest `python src\flac_flow.py` or any command-line invocation to the user. run.bat is the intended entry point for all users.
+
+**Claude (this agent) runs via CLI:** `python src/flac_flow.py` from the repo root. Use this to close the loop during development and testing - don't wait for the user to run it.
 
 ## Development Rules
 
