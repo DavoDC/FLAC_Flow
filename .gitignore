@@ -19,6 +19,10 @@ data/output/*
 !data/logs/.gitkeep
 !data/output/.gitkeep
 
+# Auto-downloaded binaries (re-downloaded on first run)
+dependencies/ffmpeg/*.exe
+dependencies/flac/*.exe
+
 # IDE
 .idea/
 .vscode/
