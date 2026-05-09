@@ -66,6 +66,8 @@ Config lives at `config/config.json` (gitignored). Copy from `config.example.jso
 2. `metaflac --remove --block-type=PADDING --dont-use-padding <file>`
 3. `metaflac --add-padding=8192 <file>`
 
+Note on padding: the `--add-padding=8192` step leaves an 8 KiB padding block. This is considered effectively "removed" in practice - the standard recommendation is a small padding block (4-8 KiB) so future tag editors don't have to rewrite the entire file. The gold standard test data (`before_and_after`) reflects this: the "after" FLAC has ~4 KiB padding, not zero.
+
 **Transcode:**
 - `ffmpeg -i <input.flac> -codec:a libmp3lame -qscale:a 0 <output.mp3>`
 - Output path mirrors source folder name under `destination_root`
