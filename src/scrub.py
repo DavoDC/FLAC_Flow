@@ -18,7 +18,7 @@ def build_scrub_commands(file_path: Path, metaflac_exe: Path) -> List[List[str]]
 def scrub_file(file_path: Path, metaflac_exe: Path) -> bool:
     """Remove PICTURE and PADDING blocks, then add 8192-byte padding. Returns True on success."""
     for cmd in build_scrub_commands(file_path, metaflac_exe):
-        result = subprocess.run(cmd, capture_output=True)
+        result = subprocess.run(cmd, capture_output=True, stdin=subprocess.DEVNULL)
         if result.returncode != 0:
             stderr = result.stderr.decode(errors="replace")
             logging.error("metaflac failed on %s: %s", file_path.name, stderr.strip())
