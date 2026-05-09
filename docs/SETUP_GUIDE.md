@@ -72,9 +72,9 @@ The first run automatically downloads FFmpeg and metaflac (~120 MB total) - no h
 
 ## Getting updates
 
-When there is a new version, double-click `scripts\update.bat`.
+When there is a new version, just double-click `scripts\update.bat` - no need to visit GitHub, re-download anything, or repeat any setup steps.
 
-That's it. Git fetches only what changed - it's fast, and your config is never touched.
+Git downloads only what changed, so updates are fast. Your config is never touched.
 
 ---
 
