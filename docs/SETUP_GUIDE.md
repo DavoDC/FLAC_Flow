@@ -82,6 +82,10 @@ Git downloads only what changed, so updates are fast. Your config is never touch
 
 ## Troubleshooting
 
+If you run into any issues or errors, send the log file to the developer. Log files are saved in the `data\logs\` folder inside your FLAC Flow installation after each run.
+
+---
+
 **Window closes immediately on double-click**
 Python is not installed or "Add Python to PATH" was not ticked. Reinstall Python and make sure to tick that option.
 
