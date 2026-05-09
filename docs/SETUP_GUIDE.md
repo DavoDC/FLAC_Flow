@@ -82,7 +82,7 @@ Git downloads only what changed, so updates are fast. Your config is never touch
 
 ## Troubleshooting
 
-If you run into any issues or errors, send the log file to the developer. Log files are saved in the `data\logs\` folder inside your FLAC Flow installation after each run.
+If you run into any issues or errors, send the log file to the developer (DavoDC). Log files are saved in the `data\logs\` folder inside your FLAC Flow installation after each run.
 
 ---
 
