@@ -6,7 +6,7 @@ No accounts required at any step. Setup takes about 10 minutes and you never hav
 
 ## Step 1 - Install Git
 
-Download: https://git-scm.com/download/win
+Download: [git-scm.com/download/win](https://git-scm.com/download/win)
 
 Run the installer, all defaults are fine.
 
@@ -16,7 +16,7 @@ Git is what lets you download FLAC Flow and get future updates instantly - no re
 
 ## Step 2 - Install Python
 
-Download: https://www.python.org/downloads/
+Download: [python.org/downloads](https://www.python.org/downloads/)
 
 Run the installer. On the first screen, tick **"Add Python to PATH"** before clicking Install.
 
@@ -47,7 +47,7 @@ Open `config.json` in a text editor and set your paths:
 - `source_folders` - folder(s) containing your FLAC files (scanned recursively)
 - `destination_root` - where converted MP3s will be saved
 
-**Path tip:** paths inside JSON need double backslashes. If you have VS Code, just paste a Windows path and it fixes them automatically. Without VS Code, double every backslash manually:
+**Path tip:** paths inside JSON need double backslashes. If you have [VS Code](https://code.visualstudio.com/), just paste a Windows path and it fixes them automatically. Without VS Code, double every backslash manually:
 
     "C:\\Music\\FLAC\\MyAlbums"
 
