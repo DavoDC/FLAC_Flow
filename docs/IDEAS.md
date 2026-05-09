@@ -10,6 +10,20 @@ TIER 0 and TIER 1 are complete - see HISTORY.md.
 
 ---
 
+**Scrub-in-place startup warning**
+
+When `scrub_art_and_padding` is true, print a clear warning before processing starts:
+
+```
+Warning: scrub_art_and_padding is enabled. Source FLAC files will be modified in-place
+(album art and padding removed). Make sure you have a backup before continuing.
+Press Enter to continue or Ctrl+C to cancel.
+```
+
+Pause for a keypress so the user has a chance to abort. Skip the prompt if a `--no-confirm` flag is passed (for scripted/batch use).
+
+---
+
 **Error handling**
 
 Handle each failure mode without crashing the whole run:
