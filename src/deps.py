@@ -14,7 +14,8 @@ from pathlib import Path
 from typing import Tuple
 
 _REPO_ROOT = Path(__file__).parent.parent
-FFMPEG_DIR = _REPO_ROOT / "dependencies" / "ffmpeg"
+_ffkit = _REPO_ROOT.parent / "ffkit"
+FFMPEG_DIR = _ffkit / "dependencies" / "ffmpeg" if _ffkit.exists() else _REPO_ROOT / "dependencies" / "ffmpeg"
 FLAC_DIR = _REPO_ROOT / "dependencies" / "flac"
 
 _FFMPEG_URL = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
