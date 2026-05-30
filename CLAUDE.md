@@ -16,6 +16,8 @@ Python CLI tool that batch-converts FLAC files to MP3 (VBR V0 using LAME) and op
 
 Both are downloaded by `src/deps.py` at startup if not already present. Always call via full path, never via PATH lookup. Pattern: `RivalsVidMaker/src/ffmpeg_setup.py`.
 
+**ffkit hub:** `src/deps.py` checks `../ffkit/dependencies/ffmpeg/` first (sibling repo). If present, uses it instead of downloading locally. Transparent - no user action needed.
+
 ## Architecture
 
 ```
