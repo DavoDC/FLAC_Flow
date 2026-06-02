@@ -74,7 +74,7 @@ Pattern to follow: `SpotifyPlaylistGen/src/lockfile.py` - self-contained, stdlib
 
 ---
 
-**Windows Terminal run.bat**
+**Windows Terminal run.bat + `--no-pause` contract**
 
 Upgrade `scripts/run.bat` to open in Windows Terminal with Git Bash (same as RivalsVidMaker and SBS_Download):
 
@@ -84,6 +84,8 @@ wt.exe -p "Git Bash" -d "%~dp0.." "C:\Program Files\Git\bin\bash.exe" --login -i
 ```
 
 Then add `scripts/run.sh` that calls `python src/flac_flow.py`. Gives a proper terminal vs bare cmd.exe.
+
+Also: current `run.bat` has unconditional `cmd /k` at the end. Add the two-mode contract (`if not "%1"=="--no-pause" cmd /k`) so Claude can invoke it headlessly without blocking. Same pattern as AudioManager and CoverVidMaker.
 
 ---
 
