@@ -4,6 +4,10 @@ Completed features and settled design decisions. Active work -> `docs/IDEAS.md`.
 
 ---
 
+## 2026-06-02 - Thin bat: --no-pause contract added to run.bat
+
+`scripts/run.bat` had an unconditional `cmd /k` at the end, blocking any headless invocation. Added the two-mode contract: no args = `cmd /k` (human), `--no-pause` = `exit /b 0` (Claude/scripted). Standard pattern across the repo family.
+
 ## 2026-05-09 - TIER 0 + TIER 1 MVP (complete foundation)
 
 Implemented all TIER 0 blocking checks and TIER 1 MVP modules in one session. The program is now fully runnable.
