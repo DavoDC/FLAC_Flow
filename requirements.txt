@@ -1,0 +1,2 @@
+# No third-party dependencies - uses Python standard library only.
+# FFmpeg and metaflac are downloaded automatically on first run.
