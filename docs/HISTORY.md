@@ -4,6 +4,10 @@ Completed features and settled design decisions. Active work -> `docs/IDEAS.md`.
 
 ---
 
+## 2026-06-05 - TIER 2: --skip-existing flag
+
+Added `--skip-existing` flag. When active: checks whether the output MP3 already exists at the mirror path before scrubbing or transcoding. If it does, prints `SKIPPED (output exists)` and increments a separate skipped counter. End-of-run summary appends `, N skipped` to the done line when any files were skipped. Useful for incremental runs that add new FLACs without re-processing the whole library. 7 new tests (39 total, all passing).
+
 ## 2026-06-05 - TIER 2: error handling + per-file error summary
 
 Added three error handling improvements:

@@ -10,14 +10,6 @@ TIER 0 and TIER 1 are complete - see HISTORY.md.
 
 ---
 
-**Skip-existing flag**
-
-`--skip-existing`: if the output MP3 already exists at the destination path, skip that file entirely (no scrub, no transcode).
-
-Log skipped files separately in the summary.
-
----
-
 **Dataclass config**
 
 Upgrade config from plain dict to a `@dataclass` so fields are typed and IDE-autocomplete works.
