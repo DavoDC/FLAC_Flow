@@ -77,6 +77,28 @@ def _find_flac_files(source_folder: Path) -> list:
     return sorted(source_folder.rglob("*.flac"))
 
 
+def _parse_since(since_str: str) -> float:
+    """Parse YYYY-MM-DD to a Unix timestamp (midnight, local time). Returns None for None input."""
+    if not since_str:
+        return None
+    from datetime import datetime
+    return datetime(int(since_str[:4]), int(since_str[5:7]), int(since_str[8:10])).timestamp()
+
+
+def _filter_by_since(flac_files: list, since_ts: float) -> list:
+    """Return only files whose mtime is >= since_ts. Skips unreadable files (no stat)."""
+    if since_ts is None:
+        return flac_files
+    result = []
+    for f in flac_files:
+        try:
+            if f.stat().st_mtime >= since_ts:
+                result.append(f)
+        except OSError:
+            result.append(f)  # include if stat fails - safer to process than silently skip
+    return result
+
+
 def _fmt(seconds: float) -> str:
     return f"{seconds:.1f}s"
 
@@ -88,6 +110,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--skip-existing", action="store_true")
     parser.add_argument("--config", default=None, metavar="PATH")
     parser.add_argument("--quality", default=None, choices=["V0", "V2", "V4"])
+    parser.add_argument("--since", default=None, metavar="YYYY-MM-DD")
     args, _ = parser.parse_known_args()
     return args
 
@@ -99,6 +122,7 @@ def main() -> None:
     dry_run = args.dry_run
     skip_existing = args.skip_existing
     quality = args.quality or "V0"
+    since_ts = _parse_since(args.since)
 
     lock = LockFile(_LOCK_PATH)
     if not lock.acquire():
@@ -151,7 +175,7 @@ def main() -> None:
 
     try:
         for fi, source_folder in enumerate(config.source_folders, 1):
-            flac_files = _find_flac_files(source_folder)
+            flac_files = _filter_by_since(_find_flac_files(source_folder), since_ts)
             prefix = "[DRY RUN] " if dry_run else ""
             print(f"{prefix}[{fi}/{folder_count} folders] {source_folder.name}  ({len(flac_files)} files)")
             logging.info(

@@ -20,8 +20,7 @@ Pattern to follow: `RivalsVidMaker/src/config.py` - `@dataclass class Config` + 
 
 **Remaining CLI flags**
 
-- `--since <YYYY-MM-DD>` - only process FLACs modified after this date (filter by mtime)
-- `--verbose` - print extra debug info (set log level to DEBUG, print config summary)
+- `--verbose` - print extra debug info (set log level to DEBUG, print config summary at startup)
 
 ---
 
