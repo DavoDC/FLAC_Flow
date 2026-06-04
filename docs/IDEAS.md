@@ -18,19 +18,6 @@ Pattern to follow: `RivalsVidMaker/src/config.py` - `@dataclass class Config` + 
 
 ---
 
-**Windows Terminal run.bat**
-
-Upgrade `scripts/run.bat` to open in Windows Terminal with Git Bash (same as RivalsVidMaker and SBS_Download):
-
-```bat
-@echo off
-wt.exe -p "Git Bash" -d "%~dp0.." "C:\Program Files\Git\bin\bash.exe" --login -i "%~dp0run.sh"
-```
-
-Then add `scripts/run.sh` that calls `python src/flac_flow.py`. Gives a proper terminal vs bare cmd.exe.
-
----
-
 **Command-line arguments**
 
 Allow overriding config on the command line. Flag format: `--key value`

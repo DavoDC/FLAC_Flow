@@ -4,6 +4,10 @@ Completed features and settled design decisions. Active work -> `docs/IDEAS.md`.
 
 ---
 
+## 2026-06-05 - TIER 2: Windows Terminal run.bat
+
+Upgraded `scripts/run.bat` to open in Windows Terminal with Git Bash (wt.exe pattern, same as RivalsVidMaker and SBS_Download). Added `scripts/run.sh` - cd to repo root, runs `python src/flac_flow.py`, then `exec bash` to keep the terminal open. Replaces the bare cmd.exe window with a proper Git Bash terminal.
+
 ## 2026-06-05 - TIER 2: PID-based lockfile (prevent double-run)
 
 Added `src/lockfile.py` (pattern-copied from SpotifyPlaylistGen). Acquired early in `main()` before config load; released before final exit. Stale lockfiles (PID no longer running) are cleaned up automatically. If lock is held: prints clear error with path to delete, exits 1. 10 new tests (49 total, all passing). Lock file: `data/flac_flow.lock`.
