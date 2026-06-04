@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from log import setup_logging
 from config import load as load_config
 from deps import ensure_deps
+from mirror import mirror_path
 from scrub import scrub_file
 from transcode import transcode_file
 
@@ -80,6 +81,7 @@ def _fmt(seconds: float) -> str:
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--no-confirm", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
     args, _ = parser.parse_known_args()
     return args
 
@@ -88,6 +90,7 @@ def main() -> None:
     global _interrupted
     _validate_platform()
     args = _parse_args()
+    dry_run = args.dry_run
 
     log_file = setup_logging()
 
@@ -96,10 +99,15 @@ def main() -> None:
     print("######################")
     print()
 
-    config = load_config()
-    _validate_destination(config.destination_root)
+    if dry_run:
+        print("[DRY RUN] No files will be modified or created.")
+        print()
 
-    if config.scrub_art_and_padding and not args.no_confirm:
+    config = load_config()
+    if not dry_run:
+        _validate_destination(config.destination_root)
+
+    if config.scrub_art_and_padding and not args.no_confirm and not dry_run:
         import msvcrt
         print("Warning: scrub_art_and_padding is enabled. Source FLAC files will be modified in-place.")
         print("Album art and padding will be permanently removed. Make sure you have a backup.")
@@ -127,7 +135,8 @@ def main() -> None:
     try:
         for fi, source_folder in enumerate(config.source_folders, 1):
             flac_files = _find_flac_files(source_folder)
-            print(f"[{fi}/{folder_count} folders] {source_folder.name}  ({len(flac_files)} files)")
+            prefix = "[DRY RUN] " if dry_run else ""
+            print(f"{prefix}[{fi}/{folder_count} folders] {source_folder.name}  ({len(flac_files)} files)")
             logging.info(
                 "Folder %d/%d: %s (%d files)", fi, folder_count, source_folder, len(flac_files)
             )
@@ -138,6 +147,17 @@ def main() -> None:
                     break
 
                 rel = flac_file.relative_to(source_folder)
+
+                if dry_run:
+                    if config.convert_to_mp3:
+                        out = mirror_path(flac_file, source_folder, config.destination_root)
+                        print(f"  [{fj}/{file_count}] [DRY RUN] {rel} -> {out}")
+                    else:
+                        action = "scrub" if config.scrub_art_and_padding else "no-op"
+                        print(f"  [{fj}/{file_count}] [DRY RUN] {rel} ({action}, no transcode)")
+                    total_files += 1
+                    continue
+
                 print(f"  [{fj}/{file_count}] {rel}", end="", flush=True)
                 file_start = time.monotonic()
                 had_error = False
@@ -180,10 +200,22 @@ def main() -> None:
     if _interrupted:
         print("Run interrupted.")
 
-    print(
-        f"Done. {folder_count} folder(s), {total_files} file(s) processed. "
-        f"Total: {_fmt(total_time)}"
-    )
+    if dry_run:
+        ops = []
+        if config.scrub_art_and_padding:
+            ops.append("scrub")
+        if config.convert_to_mp3:
+            ops.append("transcode")
+        ops_str = " + ".join(ops) if ops else "no-op"
+        print(
+            f"[DRY RUN] {folder_count} folder(s), {total_files} file(s) would be processed "
+            f"({ops_str}). No files modified."
+        )
+    else:
+        print(
+            f"Done. {folder_count} folder(s), {total_files} file(s) processed. "
+            f"Total: {_fmt(total_time)}"
+        )
 
     if t_scrub > 0 or t_transcode > 0:
         print(f"Scrub: {_fmt(t_scrub)}  |  Transcode: {_fmt(t_transcode)}")
