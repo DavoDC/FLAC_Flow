@@ -4,6 +4,10 @@ Completed features and settled design decisions. Active work -> `docs/IDEAS.md`.
 
 ---
 
+## 2026-06-05 - TIER 2: --config and --quality CLI flags
+
+Added `--config <path>` to load a non-default config file. Added `--quality <V0|V2|V4>` to override MP3 quality for the run (V0=qscale 0, V2=qscale 2, V4=qscale 4; default V0). Quality is passed through to `transcode_file()` and `build_transcode_command()`. Remaining CLI flags (`--since`, `--verbose`) still in IDEAS.md. 12 new tests (61 total, all passing).
+
 ## 2026-06-05 - TIER 2: Windows Terminal run.bat
 
 Upgraded `scripts/run.bat` to open in Windows Terminal with Git Bash (wt.exe pattern, same as RivalsVidMaker and SBS_Download). Added `scripts/run.sh` - cd to repo root, runs `python src/flac_flow.py`, then `exec bash` to keep the terminal open. Replaces the bare cmd.exe window with a proper Git Bash terminal.

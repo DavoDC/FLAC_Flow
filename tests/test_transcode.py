@@ -46,3 +46,27 @@ def test_transcode_file_returns_false_on_failure():
             with patch.object(Path, "mkdir"):
                 result = transcode_mod.transcode_file(_FILE, _SOURCE, _DEST, _FFMPEG)
     assert result is False
+
+
+def test_quality_v0_uses_qscale_0():
+    cmd = transcode_mod.build_transcode_command(_FILE, _OUTPUT, _FFMPEG, quality="V0")
+    qscale_idx = cmd.index("-qscale:a")
+    assert cmd[qscale_idx + 1] == "0"
+
+
+def test_quality_v2_uses_qscale_2():
+    cmd = transcode_mod.build_transcode_command(_FILE, _OUTPUT, _FFMPEG, quality="V2")
+    qscale_idx = cmd.index("-qscale:a")
+    assert cmd[qscale_idx + 1] == "2"
+
+
+def test_quality_v4_uses_qscale_4():
+    cmd = transcode_mod.build_transcode_command(_FILE, _OUTPUT, _FFMPEG, quality="V4")
+    qscale_idx = cmd.index("-qscale:a")
+    assert cmd[qscale_idx + 1] == "4"
+
+
+def test_quality_default_is_v0():
+    cmd = transcode_mod.build_transcode_command(_FILE, _OUTPUT, _FFMPEG)
+    qscale_idx = cmd.index("-qscale:a")
+    assert cmd[qscale_idx + 1] == "0"

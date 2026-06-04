@@ -18,22 +18,10 @@ Pattern to follow: `RivalsVidMaker/src/config.py` - `@dataclass class Config` + 
 
 ---
 
-**Command-line arguments**
+**Remaining CLI flags**
 
-Allow overriding config on the command line. Flag format: `--key value`
-
-```
-flac-flow --config /path/to/custom_config.json --quality V2 --dry-run
-```
-
-Supported flags:
-- `--config <path>` - load config from different file (default: `config/config.json`)
-- `--quality <V0|V2|V4>` - override MP3 quality for this run
-- `--since <YYYY-MM-DD>` - only process FLACs modified after this date
-- `--verbose` - print extra debug info
-- `--help` - show usage
-
-Flags override config file values.
+- `--since <YYYY-MM-DD>` - only process FLACs modified after this date (filter by mtime)
+- `--verbose` - print extra debug info (set log level to DEBUG, print config summary)
 
 ---
 

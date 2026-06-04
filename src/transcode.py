@@ -6,13 +6,22 @@ from typing import List
 from mirror import mirror_path
 
 
-def build_transcode_command(file_path: Path, output_path: Path, ffmpeg_exe: Path) -> List[str]:
-    """Return the ffmpeg command list for LAME V0 transcoding."""
+_QUALITY_QSCALE = {"V0": "0", "V2": "2", "V4": "4"}
+
+
+def build_transcode_command(
+    file_path: Path,
+    output_path: Path,
+    ffmpeg_exe: Path,
+    quality: str = "V0",
+) -> List[str]:
+    """Return the ffmpeg command list for LAME VBR transcoding."""
+    qscale = _QUALITY_QSCALE.get(quality, "0")
     return [
         str(ffmpeg_exe),
         "-i", str(file_path),
         "-codec:a", "libmp3lame",
-        "-qscale:a", "0",
+        "-qscale:a", qscale,
         str(output_path),
     ]
 
@@ -22,8 +31,9 @@ def transcode_file(
     source_folder: Path,
     destination_root: Path,
     ffmpeg_exe: Path,
+    quality: str = "V0",
 ) -> bool:
-    """Transcode FLAC to MP3 V0. Creates output directory as needed. Returns True on success."""
+    """Transcode FLAC to MP3. Creates output directory as needed. Returns True on success."""
     output_path = mirror_path(file_path, source_folder, destination_root)
     try:
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -31,7 +41,7 @@ def transcode_file(
         logging.error("Cannot create output directory %s: %s", output_path.parent, e)
         return False
 
-    cmd = build_transcode_command(file_path, output_path, ffmpeg_exe)
+    cmd = build_transcode_command(file_path, output_path, ffmpeg_exe, quality)
     result = subprocess.run(cmd, capture_output=True, stdin=subprocess.DEVNULL)
     if result.returncode != 0:
         stderr = result.stderr.decode(errors="replace")
