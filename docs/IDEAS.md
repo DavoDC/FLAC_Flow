@@ -40,16 +40,6 @@ At end of run, print a summary of any errors and their file paths.
 
 ---
 
-**Dry-run mode**
-
-`--dry-run` flag: print what would happen without calling metaflac or ffmpeg or writing any files.
-
-Output format mirrors the normal progress output but prefixed with `[DRY RUN]`. Still validates config and checks dependencies.
-
-Useful for verifying folder mirror paths before a real run.
-
----
-
 **Skip-existing flag**
 
 `--skip-existing`: if the output MP3 already exists at the destination path, skip that file entirely (no scrub, no transcode).

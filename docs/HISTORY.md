@@ -4,6 +4,10 @@ Completed features and settled design decisions. Active work -> `docs/IDEAS.md`.
 
 ---
 
+## 2026-06-05 - TIER 2: --dry-run mode
+
+Added `--dry-run` flag to `flac_flow.py`. When active: skips scrub and transcode calls, prints `[DRY RUN]` prefixed output showing each file's mirror path (`track.flac -> Album\track.mp3`), skips destination writability check and scrub confirmation prompt. Config validation and dependency checks still run. Final summary reports how many files would be processed without modifying anything. 8 new tests (27 total, all passing). Useful for verifying folder mirror paths before committing to a real run.
+
 ## 2026-06-02 - Thin bat: --no-pause contract added to run.bat
 
 `scripts/run.bat` had an unconditional `cmd /k` at the end, blocking any headless invocation. Added the two-mode contract: no args = `cmd /k` (human), `--no-pause` = `exit /b 0` (Claude/scripted). Standard pattern across the repo family.
