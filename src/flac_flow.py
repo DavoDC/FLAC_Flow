@@ -20,9 +20,12 @@ sys.path.insert(0, str(Path(__file__).parent))
 from log import setup_logging
 from config import load as load_config
 from deps import ensure_deps
+from lockfile import LockFile
 from mirror import mirror_path
 from scrub import scrub_file
 from transcode import transcode_file
+
+_LOCK_PATH = Path(__file__).parent.parent / "data" / "flac_flow.lock"
 
 _interrupted = False
 
@@ -94,6 +97,12 @@ def main() -> None:
     dry_run = args.dry_run
     skip_existing = args.skip_existing
 
+    lock = LockFile(_LOCK_PATH)
+    if not lock.acquire():
+        print("Error: Another FLAC Flow instance is already running.")
+        print(f"  If this is incorrect, delete the lockfile: {_LOCK_PATH}")
+        sys.exit(1)
+
     log_file = setup_logging()
 
     print("######################")
@@ -119,6 +128,7 @@ def main() -> None:
         print()
         if ch.lower() != "y":
             print("Aborted.")
+            lock.release()
             sys.exit(0)
 
     ffmpeg_exe, metaflac_exe = ensure_deps()
@@ -262,6 +272,8 @@ def main() -> None:
         t_transcode,
         total_time,
     )
+
+    lock.release()
 
     if _interrupted:
         sys.exit(1)
