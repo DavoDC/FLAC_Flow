@@ -126,6 +126,7 @@ def main() -> None:
 
     total_files = 0
     error_files = 0
+    error_paths: list = []
     t_scrub = 0.0
     t_transcode = 0.0
     run_start = time.monotonic()
@@ -162,6 +163,16 @@ def main() -> None:
                 file_start = time.monotonic()
                 had_error = False
 
+                try:
+                    flac_file.open("rb").close()
+                except OSError as e:
+                    logging.error("Cannot read %s: %s", flac_file.name, e)
+                    print(" ... READ ERROR")
+                    error_files += 1
+                    total_files += 1
+                    error_paths.append(flac_file)
+                    continue
+
                 if config.scrub_art_and_padding:
                     t0 = time.monotonic()
                     ok = scrub_file(flac_file, metaflac_exe)
@@ -170,6 +181,7 @@ def main() -> None:
                         print(" ... SCRUB ERROR")
                         error_files += 1
                         total_files += 1
+                        error_paths.append(flac_file)
                         had_error = True
 
                 if not had_error and config.convert_to_mp3:
@@ -180,6 +192,7 @@ def main() -> None:
                         print(" ... TRANSCODE ERROR")
                         error_files += 1
                         total_files += 1
+                        error_paths.append(flac_file)
                         had_error = True
 
                 if not had_error:
@@ -220,8 +233,11 @@ def main() -> None:
     if t_scrub > 0 or t_transcode > 0:
         print(f"Scrub: {_fmt(t_scrub)}  |  Transcode: {_fmt(t_transcode)}")
 
-    if error_files:
-        print(f"Errors: {error_files} file(s) failed - see log for details.")
+    if error_paths:
+        print(f"Errors: {len(error_paths)} file(s) failed:")
+        for p in error_paths:
+            print(f"  - {p}")
+        print("See log for details.")
 
     print(f"\nLog: {log_file}")
     print()

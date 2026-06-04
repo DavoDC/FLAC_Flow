@@ -4,6 +4,15 @@ Completed features and settled design decisions. Active work -> `docs/IDEAS.md`.
 
 ---
 
+## 2026-06-05 - TIER 2: error handling + per-file error summary
+
+Added three error handling improvements:
+- **Unreadable FLAC pre-check**: before processing each file, attempts `open('rb')`. If `OSError` (locked, permissions), prints `READ ERROR`, counts as error, continues to next file.
+- **Output directory creation failure**: `transcode.py` now catches `OSError` from `mkdir` and returns `False` instead of raising an uncaught exception.
+- **Per-file error summary**: end-of-run report now lists each failed file path (`- /path/to/bad.flac`) instead of just a count. Makes diagnosing batch failures easier.
+- Also removed "Scrub-in-place startup warning" from IDEAS.md - it was already fully implemented (msvcrt Y/N prompt with `--no-confirm` bypass).
+5 new tests (32 total, all passing).
+
 ## 2026-06-05 - TIER 2: --dry-run mode
 
 Added `--dry-run` flag to `flac_flow.py`. When active: skips scrub and transcode calls, prints `[DRY RUN]` prefixed output showing each file's mirror path (`track.flac -> Album\track.mp3`), skips destination writability check and scrub confirmation prompt. Config validation and dependency checks still run. Final summary reports how many files would be processed without modifying anything. 8 new tests (27 total, all passing). Useful for verifying folder mirror paths before committing to a real run.

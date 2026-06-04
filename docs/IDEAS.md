@@ -10,36 +10,6 @@ TIER 0 and TIER 1 are complete - see HISTORY.md.
 
 ---
 
-**Scrub-in-place startup warning**
-
-When `scrub_art_and_padding` is true, print a clear warning before processing starts:
-
-```
-Warning: scrub_art_and_padding is enabled. Source FLAC files will be modified in-place
-(album art and padding removed). Make sure you have a backup before continuing.
-Press Enter to continue or Ctrl+C to cancel.
-```
-
-Pause for a keypress so the user has a chance to abort. Skip the prompt if a `--no-confirm` flag is passed (for scripted/batch use).
-
----
-
-**Error handling**
-
-Handle each failure mode without crashing the whole run:
-
-| Scenario | Behaviour |
-|----------|-----------|
-| FLAC file is locked / unreadable | Log error for that file, skip it, continue |
-| metaflac exits non-zero | Log stderr output, mark file as scrub-failed, still attempt transcode |
-| ffmpeg exits non-zero | Log stderr output, mark file as transcode-failed, continue to next |
-| Output directory can't be created (permissions) | Log error, skip entire source folder |
-| Disk full during transcode | Print warning immediately, abort run (don't leave partial files) |
-
-At end of run, print a summary of any errors and their file paths.
-
----
-
 **Skip-existing flag**
 
 `--skip-existing`: if the output MP3 already exists at the destination path, skip that file entirely (no scrub, no transcode).
