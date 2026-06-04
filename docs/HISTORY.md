@@ -4,6 +4,10 @@ Completed features and settled design decisions. Active work -> `docs/IDEAS.md`.
 
 ---
 
+## 2026-06-05 - TIER 2: PID-based lockfile (prevent double-run)
+
+Added `src/lockfile.py` (pattern-copied from SpotifyPlaylistGen). Acquired early in `main()` before config load; released before final exit. Stale lockfiles (PID no longer running) are cleaned up automatically. If lock is held: prints clear error with path to delete, exits 1. 10 new tests (49 total, all passing). Lock file: `data/flac_flow.lock`.
+
 ## 2026-06-05 - TIER 2: --skip-existing flag
 
 Added `--skip-existing` flag. When active: checks whether the output MP3 already exists at the mirror path before scrubbing or transcoding. If it does, prints `SKIPPED (output exists)` and increments a separate skipped counter. End-of-run summary appends `, N skipped` to the done line when any files were skipped. Useful for incremental runs that add new FLACs without re-processing the whole library. 7 new tests (39 total, all passing).

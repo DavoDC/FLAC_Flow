@@ -18,14 +18,6 @@ Pattern to follow: `RivalsVidMaker/src/config.py` - `@dataclass class Config` + 
 
 ---
 
-**Lockfile - prevent double-run**
-
-Use a PID-based lockfile to prevent two parallel runs from clobbering the same output files (e.g. run.bat double-clicked).
-
-Pattern to follow: `SpotifyPlaylistGen/src/lockfile.py` - self-contained, stdlib only, handles stale lockfiles (PID no longer running). Pattern-copy wholesale. Lock file goes in `data/flac_flow.lock`.
-
----
-
 **Windows Terminal run.bat**
 
 Upgrade `scripts/run.bat` to open in Windows Terminal with Git Bash (same as RivalsVidMaker and SBS_Download):
