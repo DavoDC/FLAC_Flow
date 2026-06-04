@@ -25,7 +25,11 @@ def transcode_file(
 ) -> bool:
     """Transcode FLAC to MP3 V0. Creates output directory as needed. Returns True on success."""
     output_path = mirror_path(file_path, source_folder, destination_root)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+    except OSError as e:
+        logging.error("Cannot create output directory %s: %s", output_path.parent, e)
+        return False
 
     cmd = build_transcode_command(file_path, output_path, ffmpeg_exe)
     result = subprocess.run(cmd, capture_output=True, stdin=subprocess.DEVNULL)
