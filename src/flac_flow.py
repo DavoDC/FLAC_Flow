@@ -82,6 +82,7 @@ def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--no-confirm", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--skip-existing", action="store_true")
     args, _ = parser.parse_known_args()
     return args
 
@@ -91,6 +92,7 @@ def main() -> None:
     _validate_platform()
     args = _parse_args()
     dry_run = args.dry_run
+    skip_existing = args.skip_existing
 
     log_file = setup_logging()
 
@@ -125,6 +127,7 @@ def main() -> None:
     signal.signal(signal.SIGINT, _handle_interrupt)
 
     total_files = 0
+    skipped_files = 0
     error_files = 0
     error_paths: list = []
     t_scrub = 0.0
@@ -162,6 +165,13 @@ def main() -> None:
                 print(f"  [{fj}/{file_count}] {rel}", end="", flush=True)
                 file_start = time.monotonic()
                 had_error = False
+
+                if skip_existing and config.convert_to_mp3:
+                    output_path = mirror_path(flac_file, source_folder, config.destination_root)
+                    if output_path.exists():
+                        print(" ... SKIPPED (output exists)")
+                        skipped_files += 1
+                        continue
 
                 try:
                     flac_file.open("rb").close()
@@ -225,9 +235,10 @@ def main() -> None:
             f"({ops_str}). No files modified."
         )
     else:
+        skip_note = f", {skipped_files} skipped" if skipped_files else ""
         print(
-            f"Done. {folder_count} folder(s), {total_files} file(s) processed. "
-            f"Total: {_fmt(total_time)}"
+            f"Done. {folder_count} folder(s), {total_files} file(s) processed"
+            f"{skip_note}. Total: {_fmt(total_time)}"
         )
 
     if t_scrub > 0 or t_transcode > 0:
