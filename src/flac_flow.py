@@ -103,6 +103,17 @@ def _fmt(seconds: float) -> str:
     return f"{seconds:.1f}s"
 
 
+def _fmt_size(path: Path) -> str:
+    """Return human-readable file size string, or empty string if stat fails."""
+    try:
+        size = path.stat().st_size
+        if size >= 1024 * 1024:
+            return f" ({size / 1024 / 1024:.1f} MB)"
+        return f" ({size / 1024:.0f} KB)"
+    except OSError:
+        return ""
+
+
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--no-confirm", action="store_true")
@@ -111,6 +122,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--config", default=None, metavar="PATH")
     parser.add_argument("--quality", default=None, choices=["V0", "V2", "V4"])
     parser.add_argument("--since", default=None, metavar="YYYY-MM-DD")
+    parser.add_argument("--verbose", action="store_true")
     args, _ = parser.parse_known_args()
     return args
 
@@ -123,6 +135,7 @@ def main() -> None:
     skip_existing = args.skip_existing
     quality = args.quality or "V0"
     since_ts = _parse_since(args.since)
+    verbose = args.verbose
 
     lock = LockFile(_LOCK_PATH)
     if not lock.acquire():
@@ -142,6 +155,17 @@ def main() -> None:
         print()
 
     config = load_config(Path(args.config)) if args.config else load_config()
+
+    if verbose:
+        print(f"[VERBOSE] Source folders: {len(config.source_folders)}")
+        for sf in config.source_folders:
+            print(f"  {sf}")
+        print(f"[VERBOSE] Destination: {config.destination_root}")
+        print(f"[VERBOSE] Scrub: {config.scrub_art_and_padding}  Convert: {config.convert_to_mp3}  Quality: {quality}")
+        if args.since:
+            print(f"[VERBOSE] Since filter: {args.since}")
+        print()
+
     if not dry_run:
         _validate_destination(config.destination_root)
 
@@ -199,7 +223,8 @@ def main() -> None:
                     total_files += 1
                     continue
 
-                print(f"  [{fj}/{file_count}] {rel}", end="", flush=True)
+                size_str = _fmt_size(flac_file) if verbose else ""
+                print(f"  [{fj}/{file_count}] {rel}{size_str}", end="", flush=True)
                 file_start = time.monotonic()
                 had_error = False
 

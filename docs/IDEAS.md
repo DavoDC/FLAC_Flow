@@ -18,9 +18,6 @@ Pattern to follow: `RivalsVidMaker/src/config.py` - `@dataclass class Config` + 
 
 ---
 
-**Remaining CLI flags**
-
-- `--verbose` - print extra debug info (set log level to DEBUG, print config summary at startup)
 
 ---
 

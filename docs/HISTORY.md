@@ -4,6 +4,10 @@ Completed features and settled design decisions. Active work -> `docs/IDEAS.md`.
 
 ---
 
+## 2026-06-05 - TIER 2: --verbose flag
+
+Added `--verbose` flag. When set: prints a config summary after loading (source folder count and paths, destination root, scrub/convert settings, quality, since filter if active). Also appends file size (`4.2 MB` / `350 KB`) to each per-file progress line. Added `_fmt_size()` helper (returns empty string on stat failure). 9 new tests (81 total, all passing). All CLI flags from TIER 2 are now complete.
+
 ## 2026-06-05 - TIER 2: --since date filter flag
 
 Added `--since <YYYY-MM-DD>` flag. When set, only processes FLACs whose mtime (last modified) is on or after the given date. Implemented via `_parse_since()` (date string -> Unix timestamp) and `_filter_by_since()` (filters file list by mtime). Files that fail `stat()` are included conservatively rather than silently skipped. 11 new tests (72 total, all passing).
