@@ -86,6 +86,8 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--no-confirm", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--skip-existing", action="store_true")
+    parser.add_argument("--config", default=None, metavar="PATH")
+    parser.add_argument("--quality", default=None, choices=["V0", "V2", "V4"])
     args, _ = parser.parse_known_args()
     return args
 
@@ -96,6 +98,7 @@ def main() -> None:
     args = _parse_args()
     dry_run = args.dry_run
     skip_existing = args.skip_existing
+    quality = args.quality or "V0"
 
     lock = LockFile(_LOCK_PATH)
     if not lock.acquire():
@@ -114,7 +117,7 @@ def main() -> None:
         print("[DRY RUN] No files will be modified or created.")
         print()
 
-    config = load_config()
+    config = load_config(Path(args.config)) if args.config else load_config()
     if not dry_run:
         _validate_destination(config.destination_root)
 
@@ -206,7 +209,7 @@ def main() -> None:
 
                 if not had_error and config.convert_to_mp3:
                     t0 = time.monotonic()
-                    ok = transcode_file(flac_file, source_folder, config.destination_root, ffmpeg_exe)
+                    ok = transcode_file(flac_file, source_folder, config.destination_root, ffmpeg_exe, quality=quality)
                     t_transcode += time.monotonic() - t0
                     if not ok:
                         print(" ... TRANSCODE ERROR")
