@@ -1,5 +1,7 @@
 # IDEAS: FLAC_Flow
 
+> **STATUS: DEPRIORITISED.** Built for a friend who may not be actively using it. Do not work on this repo unprompted. Only continue if David explicitly asks.
+
 Work organised by explicit safety tiers. Within each tier, items can be done in any order. Do not move to the next tier until current tier is verified on real data.
 
 TIER 0 and TIER 1 are complete - see HISTORY.md.
