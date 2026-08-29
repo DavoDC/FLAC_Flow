@@ -14,6 +14,12 @@ TIER 0 and TIER 1 are complete - see HISTORY.md.
 
 ---
 
+**Root discipline cleanup**
+
+Move `conftest.py` and `requirements.txt` from root to appropriate subdirectories (`tests/` or `src/`). Root should contain only `.gitignore`, `README.md`, `CLAUDE.md`.
+
+---
+
 **Dataclass config**
 
 Upgrade config from plain dict to a `@dataclass` so fields are typed and IDE-autocomplete works.
